@@ -15,7 +15,9 @@ router.use(jsonParser);
 
 router.get("/", (req, res) => {
   // return res.status(200).json({ message: "You're doing your best" });
-  BioModel.findOne({ user: "test" })
+  let user = req.params.user;
+
+  BioModel.findOne({ user: req.user })
     .then(dbres => res.status(200).json(dbres))
     .catch(err => res.status(500).json(err));
 });

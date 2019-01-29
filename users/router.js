@@ -6,7 +6,7 @@ router.use(express.json());
 const { User } = require("./models");
 
 router.post("/", (req, res) => {
-  const requiredFields = ["password", "email"];
+  const requiredFields = ["password", "email", "name"];
   const missingField = requiredFields.find(field => !(field in req.body));
   if (missingField) {
     console.log("Missing Field");
@@ -18,7 +18,7 @@ router.post("/", (req, res) => {
     });
   }
 
-  const stringFields = ["password", "email"];
+  const stringFields = ["password", "email", "name"];
   const nonStringField = stringFields.find(
     field => field in req.body && typeof req.body[field] !== "string"
   );
@@ -55,6 +55,9 @@ router.post("/", (req, res) => {
     password: {
       min: 10,
       max: 72
+    },
+    name: {
+      min: 1
     }
   };
 
@@ -86,7 +89,7 @@ router.post("/", (req, res) => {
     });
   }
 
-  let { email, password } = req.body;
+  let { email, password, name } = req.body;
   email = email.toLowerCase();
 
   return User.find({ email: email })
@@ -105,7 +108,8 @@ router.post("/", (req, res) => {
     .then(hash => {
       return User.create({
         email,
-        password: hash
+        password: hash,
+        name
       });
     })
     .then(user => {
@@ -115,6 +119,7 @@ router.post("/", (req, res) => {
       if (err.reason === "ValidationError") {
         return res.status(err.code).json(err);
       }
+      console.log(err);
       res.status(500).json({ code: 500, message: "Internal Server Error" });
     });
 });
